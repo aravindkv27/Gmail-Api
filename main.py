@@ -53,6 +53,8 @@ def db_connection():
     conn = sqlite3.connect("Email.db")
     return conn
 
+
+
 # Authentication to Gmail OAuth API
 def gmail_authenticate():
 
@@ -82,6 +84,7 @@ def gmail_authenticate():
     return service
 
 
+
 # Search emails using label IDs
 def search_messages(service, user_id, label_ids=[]):
 
@@ -101,8 +104,6 @@ def search_messages(service, user_id, label_ids=[]):
 
                 final_list.append(id['id'])
 
-            # print(len(final_list))
-
             return final_list
 
         else:
@@ -117,7 +118,7 @@ def search_messages(service, user_id, label_ids=[]):
 
 
 
-# Get/extract the messages from the mail
+# Get/extract the messages from the mail, seprate and store in list(email_data).
 def get_messages(service, user_id, message_id):
 
     try:
@@ -143,17 +144,14 @@ def get_messages(service, user_id, message_id):
         email_data['date'] = str(date_for)
         # email_data['date'] = message_string['Date']
         email_data['subject'] = message_string['Subject']
-        # email_data['body'] = message_string['body']
-
+        
         if string_content_type == "multipart":
 
             # content 1 is a plain text and content 2 is a HTML text
             content1, content2 = message_string.get_payload()
             
             email_data['body'] = content1.get_payload()
-            # return content1.get_payload()
             
-
         else:
 
             # return message_string.get_payload()
@@ -162,14 +160,13 @@ def get_messages(service, user_id, message_id):
         # print(email_data)
         return email_data
 
-
     except errors.HttpError as error:
 
         print("An error occured: %s" % error )
 
 
 
-# TO check all the labels
+# TO check all the labels available
 def all_labels(service, user_id):
 
     check_labels = service.users().labels().list(userId = user_id).execute()
@@ -189,12 +186,13 @@ def all_labels(service, user_id):
         print("No Labels")
 
 
+
+# Storing emails and it's content to the database
 def email_to_db():
 
     # get the Gmail API service
     conn = db_connection()
     cur = conn.cursor()
-
 
     conn.execute("DELETE FROM email_data")
     print("data deleted")
@@ -226,15 +224,12 @@ def email_to_db():
     #     email_from_db.append(i)
     #     print(i)
 
-        
 
-    
 
 # Apply rules to perform action
 def apply_rules(user_id):
 
     conn = db_connection()
-    cur = conn.cursor()
     from_db = []
   
     # data = conn.execute('SELECT * FROM email_data;')
@@ -248,31 +243,24 @@ def apply_rules(user_id):
     pred1 = predicate["2"]['criteria']
 
     for pred in pred1:
-
-        
+   
         values = pred['value'][1]
         from_db.append(values)
-    # print(from_db)
    
     email_from = from_db[0]
     email_to = from_db[1]
     email_sub= from_db[2]
     email_date = from_db[3]
-    
-    # print(email_from)
-    # print(email_to)
-    # print(email_sub)
-    # print(email_date)
 
     global final_mail_id
     #### Fetching the mails which matches the condition
-    # print(predicate['1']['predicate'])
     find_pred = predicate["2"]['predicate']
 
+    # if predicate is ALL this condition applies.
     if find_pred[0] == "ALL":
-        # print(find_pred[0])
+       
         data = conn.execute("select Mail_id from email_data WHERE Email_From = ? AND Email_To = ? AND Email_Subject = ? AND Email_date = ?;", (email_from, email_to, email_sub, email_date,  ) )
-    # print(data.fetchall())
+   
         final_mail_id = data.fetchall()
         # print (final_mail_id)
 
@@ -285,21 +273,16 @@ def apply_rules(user_id):
     else:
         print("No data")
 
-    
-    
-    # print(type(final_mail_id))
-
+    ## Perform the action for the mail_ids
     for item in final_mail_id:
-
-        
+      
+        ## To get the message id from the list
         final_id = ''
         for i in item:
 
             final_id = final_id + i
-        # print(final_id)
 
         action1 = predicate['1']['action']['removeLabelIds']
-        # print(action1)
 
         result = service.users().messages().modify(userId=user_id, id=final_id,body={ 'removeLabelIds': action1}).execute() 
 
@@ -309,12 +292,12 @@ def apply_rules(user_id):
     conn.close()
 
 
+
 if __name__ == "__main__":
 
     user_id = 'me'
     service = gmail_authenticate()  
     # all_labels(service,user_id)
-    # search_string= "API_TEST"
     search_messages(service, user_id, ['STARRED'])
     email_to_db()
     apply_rules(user_id)
