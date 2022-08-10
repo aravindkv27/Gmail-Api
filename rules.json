@@ -112,5 +112,43 @@
             "addLabelIds":["READ"],
             "removeLabelIds":["UNREAD"]
         }
+    },
+    "4":{
+        "predicate":["ALL"],
+        "criteria":[
+            {
+                "name":"Email_From",
+                "value":[
+                    "contains",
+                   "Unikout Inc <unikout@gmail.com>"
+                ]
+            },
+            {
+                "name":"Email_To",
+                "value":[
+                    "contains",
+                    "kvaravind27@gmail.com"
+                ]
+            },
+            {
+                "name":"Email_Subject",
+                "value":[
+                    "contains",
+                    "Demo Mail"
+                ]
+            },
+            {
+                "name":"Email_date",
+                "value":[
+                    "contains",
+                    "2022-08-05"
+                ]
+            }
+        ],
+        "action":{
+
+            "addLabelIds":["READ"],
+            "removeLabelIds":["UNREAD"]
+        }
     }
 }
