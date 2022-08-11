@@ -238,7 +238,8 @@ def apply_rules(user_id):
 
     predicate = json.load(open('rules.json'))
 
-    pred1 = predicate["2"]['criteria']
+    pred1 = predicate["1"]['criteria']
+    value = predicate["1"]['value']
 
     for pred in pred1:
    
@@ -252,10 +253,10 @@ def apply_rules(user_id):
 
     global final_mail_id
     #### Fetching the mails which matches the condition
-    find_pred = predicate["2"]['predicate']
+    find_pred = predicate["1"]['predicate']
 
     # if predicate is ALL this condition applies.
-    if find_pred[0] == "ALL":
+    if find_pred[0] == "ALL" and value == "contains":
        
         data = conn.execute("select Mail_id from email_data WHERE Email_From = ? AND Email_To = ? AND Email_Subject = ? AND Email_date = ?;", (email_from, email_to, email_sub, email_date,  ) )
    
@@ -281,6 +282,7 @@ def apply_rules(user_id):
             final_id = final_id + i
 
         action1 = predicate['1']['action']['removeLabelIds']
+        action2 = predicate['1']['action']['addLabelIds']
 
         result = service.users().messages().modify(userId=user_id, id=final_id,body={ 'removeLabelIds': action1}).execute() 
 
