@@ -269,7 +269,7 @@ def apply_rules(user_id):
         # print(find_pred[0])
         data = conn.execute("SELECT Mail_id from email_data WHERE Email_From = ? OR Email_to = ? OR Email_Subject = ? OR Email_date = ?;", (email_from, email_to, email_sub, email_date,  ))
         final_mail_id = data.fetchall()
-        # print (final_mail_id)
+
 
     elif find_pred[0] == "ALL" and (value == "Does not contains" or value == "Does not equal"):
 
