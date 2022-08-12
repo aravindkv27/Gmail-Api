@@ -41,6 +41,7 @@
     },
     "2":{
         "predicate":["ALL"],
+        "value":"Does not contains",
         "criteria":[
             {
                 "name":"from",
@@ -79,6 +80,7 @@
     },
     "3":{
         "predicate":["ANY"],
+        "value":"Does not contains",
         "criteria":[
             {
                 "name":"from",
@@ -122,29 +124,69 @@
             {
                 "name":"Email_From",
                 "value":[
-                    "contains",
+                    "Does not contains",
                    "Unikout Inc <unikout@gmail.com>"
                 ]
             },
             {
                 "name":"Email_To",
                 "value":[
-                    "contains",
+                    "Does not contains",
                     "kvaravind27@gmail.com"
                 ]
             },
             {
                 "name":"Email_Subject",
                 "value":[
-                    "contains",
+                    "Does not contains",
                     "Demo Mail"
                 ]
             },
             {
                 "name":"Email_date",
                 "value":[
-                    "contains",
+                    "Does not contains",
                     "2022-08-05"
+                ]
+            }
+        ],
+        "action":{
+
+            "addLabelIds":["READ"],
+            "removeLabelIds":["UNREAD"]
+        }
+    },
+    "5":{
+        "predicate":["ANY"],
+        "value":"Does not equal",
+        "criteria":[
+            {
+                "name":"from",
+                "value":[
+                    "contains",
+                    "Aravind K V <aravind27032002@gmail.com>"
+                ]
+            },
+            {
+                "name":"to",
+                "value":[
+                    "contains",
+                    "kvaravind27@gmail.com"
+                ]
+            },
+            {
+                "name":"subject",
+                "value":[
+                    "contains",
+                    "Demo"
+                ]
+            },
+            {
+                "name":"Email_date",
+                "value":[
+                    "contains",
+                    "Greater than",
+                    "2022-08-04"
                 ]
             }
         ],

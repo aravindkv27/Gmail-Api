@@ -44,6 +44,7 @@ final_list = []
 
 email_data = {}
 
+label_names = []
 
 # Connect to Database
 def db_connection():
@@ -178,8 +179,8 @@ def all_labels(service, user_id):
     if len_of_labels > 0:
 
         for label in find_all_labels:
-
-            print(label['name'])
+            label_names.append(label['name'])
+        # print(label_names)
     else:
         print("No Labels")
 
@@ -240,6 +241,7 @@ def apply_rules(user_id):
 
     pred1 = predicate["1"]['criteria']
     value = predicate["1"]['value']
+    find_pred = predicate["1"]['predicate']
 
     for pred in pred1:
    
@@ -253,21 +255,31 @@ def apply_rules(user_id):
 
     global final_mail_id
     #### Fetching the mails which matches the condition
-    find_pred = predicate["1"]['predicate']
+    
 
     # if predicate is ALL this condition applies.
-    if find_pred[0] == "ALL" and value == "contains":
+    if find_pred[0] == "ALL" and (value == "contains" or value == "Equals"):
        
         data = conn.execute("select Mail_id from email_data WHERE Email_From = ? AND Email_To = ? AND Email_Subject = ? AND Email_date = ?;", (email_from, email_to, email_sub, email_date,  ) )
    
         final_mail_id = data.fetchall()
         # print (final_mail_id)
 
-    elif find_pred[0] == "ANY":
+    elif find_pred[0] == "ANY" and (value == "contains" or value == "Equals"):
         # print(find_pred[0])
         data = conn.execute("SELECT Mail_id from email_data WHERE Email_From = ? OR Email_to = ? OR Email_Subject = ? OR Email_date = ?;", (email_from, email_to, email_sub, email_date,  ))
         final_mail_id = data.fetchall()
         # print (final_mail_id)
+
+    elif find_pred[0] == "ALL" and (value == "Does not contains" or value == "Does not equal"):
+
+        data = conn.execute("select Mail_id from email_data WHERE Email_From != ? AND Email_To != ? AND Email_Subject != ? AND Email_date != ?;", (email_from, email_to, email_sub, email_date,  ) )
+        final_mail_id = data.fetchall()
+
+    elif find_pred[0] == "ANY" and (value == "Does not contains" or value == "Does not equal"):
+        
+        data = conn.execute("SELECT Mail_id from email_data WHERE Email_From != ? OR Email_to != ? OR Email_Subject != ? OR Email_date != ?;", (email_from, email_to, email_sub, email_date,  ))
+        final_mail_id = data.fetchall()
 
     else:
         print("No data")
@@ -283,8 +295,14 @@ def apply_rules(user_id):
 
         action1 = predicate['1']['action']['removeLabelIds']
         action2 = predicate['1']['action']['addLabelIds']
+        all_labels(service,user_id)
 
-        result = service.users().messages().modify(userId=user_id, id=final_id,body={ 'removeLabelIds': action1}).execute() 
+        if "UNREAD" in label_names:
+            result = service.users().messages().modify(userId=user_id, id=final_id,body={ 'removeLabelIds': action1}).execute() 
+            print("Marked as READ")
+        else:
+            result = service.users().messages().modify(userId=user_id, id=final_id,body={ 'addLabelIds': action2}).execute() 
+            print("Marked as UNREAD")
 
         print(result)
 
