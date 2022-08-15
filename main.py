@@ -34,6 +34,7 @@ from mimetypes import guess_type as guess_mime_type
 import email
 import base64
 import dateutil.parser as parser
+from createtable import createtable
 
 SCOPES = ['https://www.googleapis.com/auth/gmail.modify']
 # SCOPES = ['https://mail.google.com/']
@@ -191,6 +192,17 @@ def email_to_db():
     # get the Gmail API service
     conn = db_connection()
     cur = conn.cursor()
+
+    # Check if the table is exists
+    listOfTables = cur.execute(
+  """ SELECT name FROM sqlite_master WHERE type='table' AND name = "email_data"; """).fetchall()
+
+    if listOfTables == []:
+        createtable()
+        print('Table not found!')
+    else:
+        print('Table found!')
+    
 
     conn.execute("DELETE FROM email_data")
     print("data deleted")
