@@ -193,13 +193,15 @@ def email_to_db():
     conn = db_connection()
     cur = conn.cursor()
 
-    # Check if the table is exists
+    # Check if the table is exists or not
     listOfTables = cur.execute(
   """ SELECT name FROM sqlite_master WHERE type='table' AND name = "email_data"; """).fetchall()
 
     if listOfTables == []:
-        createtable()
+        
         print('Table not found!')
+        createtable()
+
     else:
         print('Table found!')
     
