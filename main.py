@@ -36,6 +36,7 @@ import base64
 import dateutil.parser as parser
 from createtable import createtable
 
+# All read/write operations except immediate, permanent deletion of threads and messages, bypassing Trash.
 SCOPES = ['https://www.googleapis.com/auth/gmail.modify']
 # SCOPES = ['https://mail.google.com/']
 
@@ -195,7 +196,7 @@ def email_to_db():
 
     # Check if the table is exists or not
     listOfTables = cur.execute(
-  """ SELECT name FROM sqlite_master WHERE type='table' AND name = "email_data"; """).fetchall()
+                """ SELECT name FROM sqlite_master WHERE type='table' AND name = "email_data"; """).fetchall()
 
     if listOfTables == []:
         
