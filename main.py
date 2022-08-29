@@ -34,7 +34,9 @@ from mimetypes import guess_type as guess_mime_type
 import email
 import base64
 import dateutil.parser as parser
+from create_table import new_table
 
+# 	All read/write operations except immediate, permanent deletion of threads and messages, bypassing Trash.
 SCOPES = ['https://www.googleapis.com/auth/gmail.modify']
 # SCOPES = ['https://mail.google.com/']
 
@@ -80,6 +82,7 @@ def gmail_authenticate():
             pickle.dump(creds, token)
 
     service=  build('gmail', 'v1', credentials=creds)
+    # print(service)
     return service
 
 
@@ -192,6 +195,19 @@ def email_to_db():
     # get the Gmail API service
     conn = db_connection()
     cur = conn.cursor()
+
+    # Check if the table is exists or not
+    listOfTables = cur.execute(
+                """ SELECT name FROM sqlite_master WHERE type='table' AND name = "email_data"; """).fetchall()
+
+    if listOfTables == []:
+        
+        print('Table not found!')
+        new_table()
+
+    else:
+        print('Table found!')
+    
 
     conn.execute("DELETE FROM email_data")
     print("data deleted")
